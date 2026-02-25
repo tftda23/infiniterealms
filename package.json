@@ -1,6 +1,6 @@
 {
   "name": "infinite-realms",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "bin": {
     "infinite-realms": "bin/cli.js"
   },

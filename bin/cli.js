@@ -6,8 +6,11 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const projectRoot = path.join(__dirname, '..');
+const pkg = require(path.join(projectRoot, 'package.json'));
 
-// FORCE CD into the project root to ensure Next.js finds tsconfig.json and aliases
+console.log(`Infinite Realms CLI v${pkg.version}`);
+
+// FORCE CD into the project root
 process.chdir(projectRoot);
 
 // Check for .env.local
@@ -31,15 +34,14 @@ NODE_ENV=development
 // Check if .next directory exists
 const nextDir = path.join(projectRoot, '.next');
 if (!fs.existsSync(nextDir)) {
-  console.log(`Project not built. Running build in ${projectRoot}...`);
+  console.log(`Project build not found. Running fresh build in ${projectRoot}...`);
   try {
-    // We use 'npx next build' while inside the projectRoot
     execSync('npx next build', { 
       stdio: 'inherit',
       env: { ...process.env, NODE_ENV: 'production' }
     });
   } catch (err) {
-    console.error('Failed to build the project. Please ensure you have all dependencies installed.');
+    console.error('Build failed. Please check the errors above.');
     process.exit(1);
   }
 }
