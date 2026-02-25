@@ -9,6 +9,7 @@ const projectRoot = path.join(__dirname, '..');
 const pkg = require(path.join(projectRoot, 'package.json'));
 
 console.log(`Infinite Realms CLI v${pkg.version}`);
+console.log(`Working Directory: ${projectRoot}`);
 
 // FORCE CD into the project root
 process.chdir(projectRoot);
@@ -34,9 +35,11 @@ NODE_ENV=development
 // Check if .next directory exists
 const nextDir = path.join(projectRoot, '.next');
 if (!fs.existsSync(nextDir)) {
-  console.log(`Project build not found. Running fresh build in ${projectRoot}...`);
+  console.log(`Project build not found. Running fresh build...`);
   try {
-    execSync('npx next build', { 
+    // Run build with absolute paths to be safe
+    const nextBin = path.join(projectRoot, 'node_modules', '.bin', 'next');
+    execSync(`${nextBin} build`, { 
       stdio: 'inherit',
       env: { ...process.env, NODE_ENV: 'production' }
     });
@@ -49,7 +52,8 @@ if (!fs.existsSync(nextDir)) {
 console.log('\nStarting Infinite Realms...');
 console.log('Access the application at http://localhost:3000\n');
 
-const start = spawn('npx', ['next', 'start'], {
+const nextBin = path.join(projectRoot, 'node_modules', '.bin', 'next');
+const start = spawn(nextBin, ['start'], {
   stdio: 'inherit',
   shell: true,
   env: { ...process.env, NODE_ENV: 'production' }
