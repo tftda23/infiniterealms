@@ -5,8 +5,10 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 
-// The directory where the package is installed
 const projectRoot = path.join(__dirname, '..');
+
+// FORCE CD into the project root to ensure Next.js finds tsconfig.json and aliases
+process.chdir(projectRoot);
 
 // Check for .env.local
 const envFile = path.join(projectRoot, '.env.local');
@@ -29,11 +31,10 @@ NODE_ENV=development
 // Check if .next directory exists
 const nextDir = path.join(projectRoot, '.next');
 if (!fs.existsSync(nextDir)) {
-  console.log('Project not built. Running build first (this might take a minute)...');
+  console.log(`Project not built. Running build in ${projectRoot}...`);
   try {
-    // Force a clean build with the correct project root
+    // We use 'npx next build' while inside the projectRoot
     execSync('npx next build', { 
-      cwd: projectRoot, 
       stdio: 'inherit',
       env: { ...process.env, NODE_ENV: 'production' }
     });
@@ -43,18 +44,10 @@ if (!fs.existsSync(nextDir)) {
   }
 }
 
-// Check database
-try {
-  console.log('Checking database connection...');
-} catch (err) {
-  console.log('Warning: Database check failed.');
-}
-
 console.log('\nStarting Infinite Realms...');
 console.log('Access the application at http://localhost:3000\n');
 
 const start = spawn('npx', ['next', 'start'], {
-  cwd: projectRoot,
   stdio: 'inherit',
   shell: true,
   env: { ...process.env, NODE_ENV: 'production' }
