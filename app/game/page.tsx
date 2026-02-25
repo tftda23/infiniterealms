@@ -17,22 +17,22 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { DMChat, THEME_STYLES } from '@/components/dm-chat';
-import type { EnvironmentTheme, ToolCallResult } from '@/components/dm-chat';
-import { CharacterSheet } from '@/components/character-sheet';
-import { GameStatePanel } from '@/components/game-state-panel';
-import { EncounterTracker } from '@/components/encounter-tracker';
+import { Button } from '../../components/ui/button';
+import { DMChat, THEME_STYLES } from '../../components/dm-chat';
+import type { EnvironmentTheme, ToolCallResult } from '../../components/dm-chat';
+import { CharacterSheet } from '../../components/character-sheet';
+import { GameStatePanel } from '../../components/game-state-panel';
+import { EncounterTracker } from '../../components/encounter-tracker';
 // CombatGrid removed — combat is now AI-driven Theater of the Mind
-import { DiceRollOverlay, type RollDisplay } from '@/components/dice-roll-overlay';
-import { DeathSaveOverlay } from '@/components/death-save-overlay';
-import type { DeathSaveResult } from '@/components/death-save-overlay';
-import { AmbientAudio } from '@/components/ambient-audio';
-import { cn } from '@/lib/utils';
+import { DiceRollOverlay, type RollDisplay } from '../../components/dice-roll-overlay';
+import { DeathSaveOverlay } from '../../components/death-save-overlay';
+import type { DeathSaveResult } from '../../components/death-save-overlay';
+import { AmbientAudio } from '../../components/ambient-audio';
+import { cn } from '../../lib/utils';
 import { toast } from 'sonner';
-import type { Campaign, Character, GameState, InventoryItem, Spell, DiceRoll, InitiativeEntry, SessionLog } from '@/types';
-import { awardXP, createXPTracker, xpToNextLevel, suggestCombatXP, XPCategory, XPAwardResult, XP_CATEGORY_LABELS } from '@/lib/xp-engine';
-import type { XPTracker } from '@/lib/xp-engine';
+import type { Campaign, Character, GameState, InventoryItem, Spell, DiceRoll, InitiativeEntry, SessionLog } from '../../types';
+import { awardXP, createXPTracker, xpToNextLevel, suggestCombatXP, XPCategory, XPAwardResult, XP_CATEGORY_LABELS } from '../../lib/xp-engine';
+import type { XPTracker } from '../../lib/xp-engine';
 
 // Enemy stat blocks for common creatures
 const ENEMY_STAT_BLOCKS: Record<string, { hp: number; ac: number; speed: number }> = {
