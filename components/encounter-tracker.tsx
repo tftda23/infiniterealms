@@ -12,16 +12,16 @@ import {
   Skull,
   ScrollText,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Badge } from '../components/ui/badge';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '../components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -29,9 +29,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { cn, getAbilityModifier } from '@/lib/utils';
-import type { Character, InitiativeEntry, GameState } from '@/types';
+} from '../components/ui/dialog';
+import { cn, getAbilityModifier } from '../lib/utils';
+import type { Character, InitiativeEntry, GameState } from '../types';
 
 interface EncounterTrackerProps {
   gameState: GameState | null;

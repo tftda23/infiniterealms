@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { EnvironmentTheme } from '@/components/dm-chat';
+import { Button } from '../components/ui/button';
+import type { EnvironmentTheme } from '../components/dm-chat';
 
 interface AmbientAudioProps {
   theme: EnvironmentTheme;

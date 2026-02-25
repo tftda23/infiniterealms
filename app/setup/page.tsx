@@ -15,22 +15,22 @@ import {
   Settings,
   BookOpen,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Textarea } from '../../components/ui/textarea';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
+} from '../../components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Badge } from '../../components/ui/badge';
 import { toast } from 'sonner';
-import { CharacterCreator, type NewCharacterData } from '@/components/character-creator';
-import { CampaignContentManager, type CampaignContent } from '@/components/campaign-content-manager';
-import type { Campaign, Character } from '@/types';
+import { CharacterCreator, type NewCharacterData } from '../../components/character-creator';
+import { CampaignContentManager, type CampaignContent } from '../../components/campaign-content-manager';
+import type { Campaign, Character } from '../../types';
 
 function SetupPageContent() {
   const searchParams = useSearchParams();

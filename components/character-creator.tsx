@@ -13,8 +13,8 @@ import {
   CheckCircle2,
   ChevronRight,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import {
   Dialog,
   DialogContent,
@@ -22,16 +22,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '../components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { cn, getAbilityModifier } from '@/lib/utils';
+} from '../components/ui/select';
+import { Badge } from '../components/ui/badge';
+import { cn, getAbilityModifier } from '../lib/utils';
 import {
   DND_RACES,
   DND_CLASSES,
@@ -48,9 +48,9 @@ import {
   calculateSpellAttackBonus,
   getHitDiceString,
   applyRacialBonuses,
-} from '@/lib/dnd-data';
-import type { AbilityName } from '@/lib/dnd-data';
-import type { AbilityScores, SavingThrows, Skills } from '@/types';
+} from '../lib/dnd-data';
+import type { AbilityName } from '../lib/dnd-data';
+import type { AbilityScores, SavingThrows, Skills } from '../types';
 
 // ─── Types ────────────────────────────────────────────────────────
 

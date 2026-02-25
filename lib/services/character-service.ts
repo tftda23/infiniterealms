@@ -1,5 +1,5 @@
 import { query } from '../db';
-import type { Character, InventoryItem, Spell, AbilityScores, SavingThrows, Skills } from '@/types';
+import type { Character, InventoryItem, Spell, AbilityScores, SavingThrows, Skills } from '../../types';
 
 // ============================================
 // Character CRUD Operations

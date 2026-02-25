@@ -1,5 +1,5 @@
 import { query, transaction } from '../db';
-import type { Campaign, GameState, NPC, Quest, Location, Faction } from '@/types';
+import type { Campaign, GameState, NPC, Quest, Location, Faction } from '../../types';
 
 // ============================================
 // Campaign CRUD Operations

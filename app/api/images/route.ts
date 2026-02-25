@@ -3,7 +3,7 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 import { z } from 'zod';
-import * as settingsService from '@/lib/services/settings-service';
+import * as settingsService from '../../../lib/services/settings-service';
 
 const SUPPORTED_FORMATS = ['png', 'jpg', 'jpeg', 'webp'];
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as messageService from '@/lib/services/message-service';
+import * as messageService from '../../../lib/services/message-service';
 
 // GET /api/sessions?campaignId=xxx — get session logs + current session
 export async function GET(request: NextRequest) {

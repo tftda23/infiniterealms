@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as characterService from '@/lib/services/character-service';
+import * as characterService from '../../../lib/services/character-service';
 import { z } from 'zod';
-import { AbilityScores } from '@/types';
-import { getSpellSlots, DEFAULT_STARTING_SPELLS, getClassData } from '@/lib/dnd-data';
-import { getSpellsByClass } from '@/lib/srd-data';
+import { AbilityScores } from '../../../types';
+import { getSpellSlots, DEFAULT_STARTING_SPELLS, getClassData } from '../../../lib/dnd-data';
+import { getSpellsByClass } from '../../../lib/srd-data';
 
 const getCharactersSchema = z.object({
   campaignId: z.string().uuid('Invalid campaign ID format (must be UUID)'),

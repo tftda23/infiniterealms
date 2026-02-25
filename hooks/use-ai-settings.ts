@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { AISettings } from '@/types';
+import { AISettings } from '../types';
 import { toast } from 'sonner';
 
 const DEFAULT_SETTINGS: AISettings = {

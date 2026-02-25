@@ -408,7 +408,7 @@ function GamePageContent() {
   }, [currentSessionId, campaignId, sessionNumber]);
 
   // Import rollDice utility
-  const { rollDice } = require('@/lib/utils');
+  const { rollDice } = require('../../lib/utils');
 
   // Detect environment theme
   const environmentTheme = useMemo(

@@ -18,29 +18,29 @@ import {
   AlertTriangle,
   ImageIcon,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '../../components/ui/card';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
+} from '../../components/ui/select';
+import { Badge } from '../../components/ui/badge';
+import { Slider } from '../../components/ui/slider';
+import { Textarea } from '../../components/ui/textarea';
+import { Switch } from '../../components/ui/switch';
 import { toast } from 'sonner';
-import type { AIProvider, AISettings } from '@/types';
-import { AI_PROVIDERS } from '@/lib/ai-providers';
+import type { AIProvider, AISettings } from '../../types';
+import { AI_PROVIDERS } from '../../lib/ai-providers';
 
 const DEFAULT_SETTINGS: AISettings = {
   defaultProvider: 'openai',

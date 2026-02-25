@@ -16,17 +16,17 @@ import {
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Textarea } from '../components/ui/textarea';
+import { Badge } from '../components/ui/badge';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from '../components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -34,17 +34,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '../components/ui/dialog';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { cn } from '@/lib/utils';
+} from '../components/ui/select';
+import { cn } from '../lib/utils';
 import { toast } from 'sonner';
-import type { CampaignContent, ContentType, ContentCategory } from '@/types';
+import type { CampaignContent, ContentType, ContentCategory } from '../types';
 
 // Re-export for convenience
 export type { CampaignContent };

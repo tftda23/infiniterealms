@@ -4,7 +4,7 @@ import { createDMTools } from './tools';
 import * as campaignService from '../services/campaign-service';
 import * as characterService from '../services/character-service';
 import * as messageService from '../services/message-service';
-import type { Campaign, Character, GameState, ChatMessage } from '@/types';
+import type { Campaign, Character, GameState, ChatMessage } from '../../types';
 
 // ============================================
 // DM Engine - Core AI Integration

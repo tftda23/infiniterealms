@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as campaignService from '@/lib/services/campaign-service';
+import * as campaignService from '../../../lib/services/campaign-service';
 import { z } from 'zod';
 
 const createCampaignSchema = z.object({

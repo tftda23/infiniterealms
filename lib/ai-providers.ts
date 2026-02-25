@@ -4,7 +4,7 @@
  */
 
 import OpenAI from 'openai';
-import type { AIProvider, AIProviderConfig, AIModel, AISettings } from '@/types';
+import type { AIProvider, AIProviderConfig, AIModel, AISettings } from '../types';
 
 // ============================================
 // Provider Configurations

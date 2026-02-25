@@ -2,8 +2,8 @@
 
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Skull, Heart, ShieldAlert, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { Button } from '../components/ui/button';
+import { cn } from '../lib/utils';
 
 interface DeathSaveOverlayProps {
   characterName: string;

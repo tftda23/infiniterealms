@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { cn } from '@/lib/utils';
+import { cn } from '../lib/utils';
 import { DiceCanvas, type DieConfig, type DiePosition } from './dice-renderer';
-import type { DiceRoll } from '@/types';
+import type { DiceRoll } from '../types';
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES

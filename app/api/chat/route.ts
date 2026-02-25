@@ -2,14 +2,14 @@ import { NextRequest } from 'next/server';
 import OpenAI from 'openai';
 import Anthropic from '@anthropic-ai/sdk';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import * as campaignService from '@/lib/services/campaign-service';
-import * as characterService from '@/lib/services/character-service';
-import * as messageService from '@/lib/services/message-service';
-import * as settingsService from '@/lib/services/settings-service';
-import * as contentService from '@/lib/services/campaign-content-service';
-import { AI_PROVIDERS, getModelConfig } from '@/lib/ai-providers';
+import * as campaignService from '../../../lib/services/campaign-service';
+import * as characterService from '../../../lib/services/character-service';
+import * as messageService from '../../../lib/services/message-service';
+import * as settingsService from '../../../lib/services/settings-service';
+import * as contentService from '../../../lib/services/campaign-content-service';
+import { AI_PROVIDERS, getModelConfig } from '../../../lib/ai-providers';
 import { z } from 'zod';
-import type { AIProvider } from '@/types';
+import type { AIProvider } from '../../../types';
 import { HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
 const geminiTools = [

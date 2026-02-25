@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as campaignService from '@/lib/services/campaign-service';
+import * as campaignService from '../../../../lib/services/campaign-service';
 import { z } from 'zod';
-import type { Campaign } from '@/types';
+import type { Campaign } from '../../../../types';
 
 const campaignIdSchema = z.object({
   id: z.string().uuid('Invalid campaign ID format (must be UUID)'),

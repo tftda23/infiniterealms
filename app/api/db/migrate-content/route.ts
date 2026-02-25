@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { query } from '@/lib/db';
+import { query } from '../../../../lib/db';
 
 // POST - Create campaign_content table if it doesn't exist
 export async function POST() {

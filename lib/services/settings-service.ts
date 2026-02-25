@@ -1,5 +1,5 @@
 import { query } from '../db';
-import type { AISettings, AIProvider } from '@/types';
+import type { AISettings, AIProvider } from '../../types';
 import { encrypt, decrypt } from '../utils';
 
 const SETTINGS_ID = 1;

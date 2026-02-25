@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { setupDatabase, checkDatabaseConnection, query } from '@/lib/db';
+import { setupDatabase, checkDatabaseConnection, query } from '../../../../lib/db';
 
 // Run any pending migrations
 async function runMigrations() {

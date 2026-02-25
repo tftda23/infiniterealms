@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Cinzel, Nunito } from 'next/font/google';
 import { Toaster } from 'sonner';
 import './globals.css';
-import ErrorBoundary from '@/components/error-boundary';
+import ErrorBoundary from '../components/error-boundary';
 
 const cinzel = Cinzel({
   subsets: ['latin'],

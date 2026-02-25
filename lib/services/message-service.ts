@@ -1,5 +1,5 @@
 import { query } from '../db';
-import type { ChatMessage, SessionLog, RuleViolation, DiceRoll } from '@/types';
+import type { ChatMessage, SessionLog, RuleViolation, DiceRoll } from '../../types';
 
 // ============================================
 // Message Operations

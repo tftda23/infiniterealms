@@ -3,20 +3,20 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Loader2, Volume2, VolumeX, Hexagon, AlertCircle, MessageSquare, Users, Eye, X, Maximize2, Trash2, MapPin } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '../components/ui/button';
+import { Textarea } from '../components/ui/textarea';
+import { ScrollArea } from '../components/ui/scroll-area';
+import { cn } from '../lib/utils';
+import { Badge } from '../components/ui/badge';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '../components/ui/select';
 import Link from 'next/link';
-import type { Character, ChatMode } from '@/types';
+import type { Character, ChatMode } from '../types';
 
 interface Message {
   id: string;

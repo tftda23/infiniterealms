@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as settingsService from '@/lib/services/settings-service';
+import * as settingsService from '../../../lib/services/settings-service';
 import { z } from 'zod';
-import type { AISettings, AIProvider } from '@/types';
+import type { AISettings, AIProvider } from '../../../types';
 
 const aiProviders = ['openai', 'anthropic', 'gemini', 'deepseek', 'openrouter'] as const;
 

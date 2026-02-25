@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as characterService from '@/lib/services/character-service';
+import * as characterService from '../../../../lib/services/character-service';
 import { z } from 'zod';
-import type { AbilityScores, SavingThrows, Skills, Character } from '@/types';
+import type { AbilityScores, SavingThrows, Skills, Character } from '../../../../types';
 
 const characterIdSchema = z.object({
   id: z.string().uuid('Invalid character ID format (must be UUID)'),

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'fs';
 import path from 'path';
-import * as settingsService from '@/lib/services/settings-service';
+import * as settingsService from '../../../../lib/services/settings-service';
 
 async function getStoragePath(): Promise<string> {
   try {

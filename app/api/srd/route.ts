@@ -13,7 +13,7 @@ import {
   findItemByName,
   getItemsByType,
   getItemsByRarity,
-} from '@/lib/srd-data';
+} from '../../../lib/srd-data';
 import { z } from 'zod';
 
 // Validation schemas

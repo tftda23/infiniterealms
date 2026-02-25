@@ -1,5 +1,5 @@
 import { query } from '../db';
-import type { CampaignContent, ContentType, ContentCategory } from '@/types';
+import type { CampaignContent, ContentType, ContentCategory } from '../../types';
 
 // Helper to convert database row to CampaignContent
 function rowToContent(row: Record<string, unknown>): CampaignContent {

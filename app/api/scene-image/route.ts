@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as campaignService from '@/lib/services/campaign-service';
-import * as settingsService from '@/lib/services/settings-service';
+import * as campaignService from '../../../lib/services/campaign-service';
+import * as settingsService from '../../../lib/services/settings-service';
 import { z } from 'zod';
-import type { SceneTheme } from '@/types';
+import type { SceneTheme } from '../../../types';
 
 const generateSceneImageSchema = z.object({
   campaignId: z.string().uuid('Invalid campaign ID format (must be UUID)'),

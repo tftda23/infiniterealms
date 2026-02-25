@@ -1,4 +1,4 @@
-import type { Character, DndBeyondCharacter, DndBeyondSyncResult, AbilityScores } from '@/types';
+import type { Character, DndBeyondCharacter, DndBeyondSyncResult, AbilityScores } from '../../types';
 import { updateCharacter } from './character-service';
 
 // ============================================

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import * as contentService from '@/lib/services/campaign-content-service';
+import * as contentService from '../../../../lib/services/campaign-content-service';
 import { z } from 'zod';
 
 type RouteParams = {

@@ -15,14 +15,14 @@ import {
   BookOpen,
   Save,
 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { cn, getAbilityModifier, formatModifier } from '@/lib/utils';
-import { xpToNextLevel, XP_THRESHOLDS } from '@/lib/xp-engine';
-import { getClassFeaturesAtLevel } from '@/lib/dnd-data';
-import type { Character, InventoryItem, Spell, DiceRoll } from '@/types';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { cn, getAbilityModifier, formatModifier } from '../lib/utils';
+import { xpToNextLevel, XP_THRESHOLDS } from '../lib/xp-engine';
+import { getClassFeaturesAtLevel } from '../lib/dnd-data';
+import type { Character, InventoryItem, Spell, DiceRoll } from '../types';
 import { ChevronDown, ChevronRight, Zap, Star } from 'lucide-react';
 
 // Skill to ability mapping
