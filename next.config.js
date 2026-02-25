@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
@@ -12,11 +13,6 @@ const nextConfig = {
         hostname: 'oaidalleapiprodscus.blob.core.windows.net',
       },
     ],
-  },
-  // Force clean builds in global environments
-  webpack: (config, { dev, isServer }) => {
-    config.cache = false;
-    return config;
   },
 };
 

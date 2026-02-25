@@ -1,0 +1,34 @@
+# npm uses 'files' whitelist in package.json, but this
+# ensures nothing leaks. Only ship what 'files' specifies.
+#
+# The 'files' field in package.json controls what gets published:
+#   .next/standalone  — pre-built Node.js server
+#   .next/static      — compiled CSS/JS bundles
+#   public            — static assets (images, dice, etc.)
+#   bin               — CLI entry point
+#   scripts/setup-schema.sql — database schema
+
+# Source code (not needed — we ship pre-built)
+app/
+components/
+hooks/
+lib/
+types/
+styles/
+
+# Config files (build-time only)
+tsconfig.json
+tailwind.config.ts
+postcss.config.mjs
+next.config.js
+
+# Dev/test
+*.test.*
+*.spec.*
+coverage/
+.eslintrc*
+
+# Local files
+.env*.local
+node_modules/
+.DS_Store

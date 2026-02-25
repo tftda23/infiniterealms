@@ -1,21 +1,49 @@
 {
   "name": "infinite-realms",
-  "version": "1.2.2",
+  "version": "2.0.0",
+  "description": "AI-Powered Solo D&D 5e — full campaign engine with combat, spells, dice, and multiple AI providers",
   "bin": {
     "infinite-realms": "bin/cli.js"
   },
+  "files": [
+    ".next/standalone",
+    ".next/static",
+    "public",
+    "bin",
+    "scripts"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "db:schema": "psql -d dndsolo -f scripts/setup-schema.sql",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "dnd",
+    "dungeons-and-dragons",
+    "5e",
+    "solo-rpg",
+    "ai",
+    "dungeon-master",
+    "tabletop",
+    "rpg"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tftda23/infiniterealms.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "@3d-dice/dice-box-threejs": "^0.0.12",
     "@ai-sdk/openai": "^0.0.70",
     "@anthropic-ai/sdk": "^0.32.0",
+    "@electric-sql/pglite": "^0.3.15",
     "@google/generative-ai": "^0.15.0",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
@@ -35,12 +63,7 @@
     "@radix-ui/react-switch": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.0",
-    "@types/node": "^22.0.0",
-    "@types/pg": "^8.11.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
     "ai": "^3.4.0",
-    "autoprefixer": "^10.4.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -48,22 +71,25 @@
     "next": "^15.1.0",
     "next-themes": "^0.4.0",
     "openai": "^4.70.0",
-    "pg": "^8.13.0",
-    "postcss": "^8.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.53.0",
     "react-markdown": "^9.0.0",
     "sonner": "^1.7.0",
     "tailwind-merge": "^2.6.1",
-    "tailwindcss": "^3.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "typescript": "^5.6.0",
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.0",
     "eslint": "^9.0.0",
-    "eslint-config-next": "^15.1.0"
+    "eslint-config-next": "^15.1.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.6.0"
   },
   "overrides": {
     "@ai-sdk/provider": "0.0.26",

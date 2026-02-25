@@ -1,84 +1,140 @@
-import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg';
+import { PGlite } from '@electric-sql/pglite';
+import path from 'path';
+import os from 'os';
+import fs from 'fs';
 
 // ============================================
-// Database Connection Pool
+// PGlite Embedded Database
 // ============================================
+// Uses PGlite (PostgreSQL compiled to WASM) for zero-dependency local install.
+// Data stored in ~/.infinite-realms/pgdata/
+// Production hosted version uses standard PostgreSQL.
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://localhost:5432/dndsolo',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+// Determine data directory
+const DATA_DIR = process.env.PGLITE_DATA_DIR
+  || path.join(os.homedir(), '.infinite-realms', 'pgdata');
 
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
-});
+// Ensure data directory exists
+try {
+  if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  }
+} catch {
+  // May fail in edge environments — PGlite will handle it
+}
+
+// ============================================
+// Compatibility Layer
+// ============================================
+// Provides the same query interface as node-postgres (pg)
+// so all service code works unchanged.
+
+export interface QueryResult<T extends Record<string, any> = Record<string, any>> {
+  rows: T[];
+  rowCount: number | null;
+  fields: { name: string; dataTypeID: number }[];
+}
+
+// Minimal client interface matching what services actually use
+export interface TransactionClient {
+  query: <T extends Record<string, any> = Record<string, any>>(
+    text: string,
+    params?: unknown[]
+  ) => Promise<QueryResult<T>>;
+}
+
+// Singleton PGlite instance
+let db: PGlite | null = null;
+
+async function getDb(): Promise<PGlite> {
+  if (!db) {
+    db = new PGlite(DATA_DIR);
+    await db.waitReady;
+  }
+  return db;
+}
 
 // ============================================
 // Query Helpers
 // ============================================
 
-// Add imports for necessary types if needed, although Error and Promise are built-in
-// import { DatabaseError } from 'pg'; // If we want to check for specific pg errors
-
 const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 500; // 500ms
+const RETRY_DELAY_MS = 500;
 
 export async function query<T extends Record<string, any> = Record<string, any>>(
   text: string,
   params?: unknown[]
 ): Promise<QueryResult<T>> {
   const start = Date.now();
+  const instance = await getDb();
 
   for (let i = 0; i <= MAX_RETRIES; i++) {
     try {
-      const result = await pool.query<T>(text, params);
+      const result = await instance.query<T>(text, params as any[]);
       const duration = Date.now() - start;
+
       if (process.env.NODE_ENV === 'development') {
-        console.log('Executed query', { text: text.substring(0, 50), duration, rows: result.rowCount });
+        console.log('Executed query', {
+          text: text.substring(0, 50),
+          duration,
+          rows: result.rows.length,
+        });
       }
-      return result;
+
+      // Map PGlite result to pg-compatible shape
+      return {
+        rows: result.rows,
+        rowCount: result.affectedRows ?? result.rows.length,
+        fields: result.fields,
+      };
     } catch (error: any) {
-      console.error(`Query error (attempt ${i + 1}/${MAX_RETRIES + 1}):`, { text: text.substring(0, 100), error });
+      console.error(`Query error (attempt ${i + 1}/${MAX_RETRIES + 1}):`, {
+        text: text.substring(0, 100),
+        error: error?.message || error,
+      });
 
-      // Check if it's a retriable connection error
-      // In a real application, you might want to check for specific error codes
-      // e.g., if (error.code === 'ECONNREFUSED' || error.code === '57P01')
-      const isRetriable = error && (error.code === 'ECONNREFUSED' || error.code === '57P01' || error.code === '57P03'); // Example codes
-
-      if (isRetriable && i < MAX_RETRIES) {
+      if (i < MAX_RETRIES) {
         console.log(`Retrying query after ${RETRY_DELAY_MS}ms...`);
         await new Promise(resolve => setTimeout(resolve, RETRY_DELAY_MS));
-        continue; // Continue to the next retry attempt
+        continue;
       } else {
-        throw error; // Re-throw non-retriable errors or if max retries reached
+        throw error;
       }
     }
   }
-  // This line should technically be unreachable, but good for completeness
   throw new Error('Max retries reached without successful query.');
 }
 
-export async function getClient(): Promise<PoolClient> {
-  return pool.connect();
+export async function getClient(): Promise<TransactionClient> {
+  return {
+    query: async <T extends Record<string, any> = Record<string, any>>(
+      text: string,
+      params?: unknown[]
+    ) => query<T>(text, params),
+  };
 }
 
+// Transaction support — uses PGlite's native transaction
 export async function transaction<T>(
-  callback: (client: PoolClient) => Promise<T>
+  callback: (client: TransactionClient) => Promise<T>
 ): Promise<T> {
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    const result = await callback(client);
-    await client.query('COMMIT');
-    return result;
-  } catch (error) {
-    await client.query('ROLLBACK');
-    throw error;
-  } finally {
-    client.release();
-  }
+  const instance = await getDb();
+  return instance.transaction(async (tx) => {
+    const client: TransactionClient = {
+      query: async <R extends Record<string, any> = Record<string, any>>(
+        text: string,
+        params?: unknown[]
+      ): Promise<QueryResult<R>> => {
+        const result = await tx.query<R>(text, params as any[]);
+        return {
+          rows: result.rows,
+          rowCount: result.affectedRows ?? result.rows.length,
+          fields: result.fields,
+        };
+      },
+    };
+    return callback(client);
+  });
 }
 
 // ============================================
@@ -225,7 +281,7 @@ CREATE TABLE IF NOT EXISTS messages (
   tool_results JSONB,
   dice_rolls JSONB,
   scene_change BOOLEAN DEFAULT false,
-  tool_call_id VARCHAR(255), -- Add this line
+  tool_call_id VARCHAR(255),
   timestamp TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -290,40 +346,46 @@ CREATE INDEX IF NOT EXISTS idx_campaign_content_campaign ON campaign_content(cam
 
 export async function setupDatabase(): Promise<void> {
   console.log('Setting up database schema...');
+  const instance = await getDb();
 
-  // Split schema into individual statements and execute each
-  const statements = SCHEMA
-    .split(';')
-    .map(s => s.trim())
-    .filter(s => s.length > 0 && !s.startsWith('--'));
-
-  for (const statement of statements) {
-    try {
-      await pool.query(statement);
-      console.log('Executed:', statement.substring(0, 60) + '...');
-    } catch (error) {
-      console.error('Schema statement failed:', statement.substring(0, 100));
-      throw error;
-    }
-  }
-
-  // Idempotently add the new tool_call_id column to the messages table
-  console.log('Attempting to add tool_call_id column to messages table if it does not exist...');
+  // PGlite supports exec() for multi-statement SQL
   try {
-    const alterStatement = 'ALTER TABLE messages ADD COLUMN tool_call_id VARCHAR(255);';
-    await pool.query(alterStatement);
-    console.log('Successfully added tool_call_id column to messages table.');
-  } catch (error: any) {
-    // Ignore "column already exists" error (code 42701 for PostgreSQL)
-    if (error.code !== '42701') {
-      console.error('Failed to add tool_call_id column:', error);
-      throw error;
-    } else {
-      console.log('Column tool_call_id already exists. Skipping migration.');
+    await instance.exec(SCHEMA);
+    console.log('Database schema setup complete.');
+  } catch (error) {
+    console.error('Schema setup failed, trying statement-by-statement...');
+
+    // Fallback: split and execute individually
+    const statements = SCHEMA
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => s.length > 0 && !s.startsWith('--'));
+
+    for (const statement of statements) {
+      try {
+        await instance.query(statement);
+      } catch (stmtError: any) {
+        // Ignore "already exists" errors
+        if (!stmtError?.message?.includes('already exists')) {
+          console.error('Schema statement failed:', statement.substring(0, 100));
+          throw stmtError;
+        }
+      }
     }
+    console.log('Database schema setup complete (statement-by-statement).');
   }
 
-  console.log('Database schema setup complete.');
+  // Idempotently add the tool_call_id column
+  try {
+    await instance.query('ALTER TABLE messages ADD COLUMN tool_call_id VARCHAR(255)');
+    console.log('Added tool_call_id column to messages table.');
+  } catch (error: any) {
+    // Ignore "column already exists" error
+    if (!error?.message?.includes('already exists')) {
+      console.error('Failed to add tool_call_id column:', error);
+    }
+  }
 }
 
-export default pool;
+// Default export for backward compatibility
+export default { query };
