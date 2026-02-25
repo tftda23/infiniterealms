@@ -27,6 +27,13 @@ c) **Commercial Hosting:** The Author (Infinite Realms) reserves the exclusive r
 
 By submitting any modification or contribution to the Author, you agree to license that contribution to the Author under the same terms as this License, and you grant the Author a perpetual, irrevocable, world-wide, sublicensable license to use, modify, and distribute your contribution as part of the Software.
 
-## 5. NO WARRANTY
+## 5. LLM TOKEN USAGE AND LIABILITY
+
+The Software requires connection to third-party Large Language Model (LLM) providers (e.g., OpenAI, Anthropic, Google). 
+a) **Cost Responsibility:** The User is solely responsible for all costs, fees, and charges incurred through the use of their own API tokens within the Software.
+b) **No Liability for Costs:** Infinite Realms accepts no liability for any financial charges incurred as a result of using the Software, including but not limited to usage spikes, errors in the Software, or unauthorized use of the User's tokens.
+c) **Risk Acceptance:** Usage of third-party API tokens is at the User's own risk. Infinite Realms provides no guarantees regarding the security of third-party providers or the long-term persistence of local encryption measures.
+
+## 6. NO WARRANTY
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

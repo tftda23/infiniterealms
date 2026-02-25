@@ -30,7 +30,7 @@ AI-powered solo Dungeons & Dragons 5th Edition experience.
 
 - Node.js 18+
 - PostgreSQL 15+
-- OpenAI API key
+- OpenAI API key (or other supported LLM provider)
 
 ### Installation (via CLI)
 
@@ -54,7 +54,7 @@ infinite-realms
 
 1. Clone and install dependencies:
    ```bash
-   git clone https://github.com/your-username/infinite-realms.git
+   git clone https://github.com/tftda23/infiniterealms.git
    cd infinite-realms
    npm install
    ```
@@ -81,6 +81,45 @@ infinite-realms
    ```
 
 5. Open [http://localhost:3000](http://localhost:3000)
+
+## How to Play
+
+### 1. Initial Setup (LLM Token)
+Once you access the web application, you must first configure your AI provider.
+- Go to the **Settings** page.
+- Enter your API token for your preferred provider (OpenAI, Anthropic, etc.).
+- Click **Save Settings**.
+
+### 2. Create a Campaign
+- From the Home page, click **Create New Campaign**.
+- Define your world setting, DM personality, and rules enforcement level.
+
+<!-- ![Create Campaign Placeholder](https://via.placeholder.com/800x400?text=Create+Campaign+Interface) -->
+
+### 3. Add Characters
+- Within your campaign, add your player characters.
+- You can create them manually or import them directly from **D&D Beyond**.
+
+<!-- ![Character Sheet Placeholder](https://via.placeholder.com/800x400?text=Character+Management) -->
+
+### 4. Begin Adventure
+- Once your party is ready, click **Begin Adventure**.
+- Start chatting with the DM to begin your story!
+
+<!-- ![Gameplay Placeholder](https://via.placeholder.com/800x400?text=Gameplay+Interface) -->
+
+## Security & Token Usage
+
+### Security Measures
+- **Local Storage**: Your API tokens are encrypted and stored in your local PostgreSQL database.
+- **Encryption**: We use AES-256 encryption to protect your tokens at rest.
+- **Server-Side Only**: Tokens are never sent to the client browser after they are saved; they are only used server-side to communicate with the LLM providers.
+
+### Liability & Risk
+- **User Responsibility**: Usage of your token is entirely at your own choice.
+- **Cost Disclaimer**: Infinite Realms accepts **no liability** for costs incurred due to the usage of the application with your own LLM token. AI usage can be expensive; monitor your usage dashboards on your provider's website.
+- **Risk Acceptance**: By using this application, the user accepts all risks associated with API token usage and security.
+- **Recommendation**: We strongly advise using **short-lived tokens** or setting **usage limits** on your AI provider's dashboard to prevent unexpected costs.
 
 ## License
 
