@@ -1,0 +1,32 @@
+# INFINITE REALMS LICENSE AGREEMENT
+
+Version 1.0, February 2026
+
+Copyright (c) 2026 Infinite Realms
+
+## 1. DEFINITIONS
+
+"Software" means the "Infinite Realms" computer program and all associated documentation.
+"Author" means the copyright holder (Infinite Realms).
+"User" means any person or entity using the Software.
+
+## 2. GRANT OF LICENSE
+
+The Author hereby grants you a non-exclusive, world-wide, royalty-free license to:
+
+a) **Use:** Download, install, and run the Software for personal, educational, or internal business purposes.
+b) **Contribute:** Modify the Software and submit those modifications (Pull Requests) to the official repository for potential inclusion in the Software.
+
+## 3. RESTRICTIONS
+
+a) **Redistribution:** You may NOT redistribute, sublicense, or sell the Software or any modified versions of it to any third party.
+b) **Modification:** While you may modify the Software for your own personal use or to contribute back to the Author, you may NOT distribute modified versions of the Software as a separate product.
+c) **Commercial Hosting:** The Author (Infinite Realms) reserves the exclusive right to host the Software as a public service or commercial platform. You may NOT offer the Software as a hosted service (SaaS) or charge others for access to an instance of the Software hosted by you.
+
+## 4. CONTRIBUTIONS
+
+By submitting any modification or contribution to the Author, you agree to license that contribution to the Author under the same terms as this License, and you grant the Author a perpetual, irrevocable, world-wide, sublicensable license to use, modify, and distribute your contribution as part of the Software.
+
+## 5. NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
