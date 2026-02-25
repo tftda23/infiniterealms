@@ -1,5 +1,8 @@
 # Infinite Realms
 
+> [!CAUTION]
+> **Early Access / Alpha Release**: This project is in very early development. Expect bugs, breaking changes, and evolving features. We welcome feedback and bug reports!
+
 AI-powered solo Dungeons & Dragons 5th Edition experience.
 
 ## Features
@@ -84,3 +87,12 @@ infinite-realms
 Infinite Realms is licensed under a custom agreement. It is free to use and we welcome contributions. However, modification for redistribution and direct redistribution of the software are not permitted. Infinite Realms reserves the exclusive right to provide hosted versions of the software.
 
 See the [LICENSE](LICENSE) file for the full terms.
+
+## Contributing
+
+We love contributions! Since this is an early-stage project, the best ways to help are:
+1. **Bug Reports**: Open an issue if something doesn't work.
+2. **Feature Ideas**: Suggest new tools or DM personalities.
+3. **Pull Requests**: Submit improvements to the DM engine or UI.
+
+*Note: By contributing, you agree to license your work under the terms of the Infinite Realms License.*
