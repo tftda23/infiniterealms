@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 
+// The directory where the package is installed
 const projectRoot = path.join(__dirname, '..');
 
 // Check for .env.local
@@ -30,28 +31,33 @@ const nextDir = path.join(projectRoot, '.next');
 if (!fs.existsSync(nextDir)) {
   console.log('Project not built. Running build first (this might take a minute)...');
   try {
-    execSync('npm run build', { cwd: projectRoot, stdio: 'inherit' });
+    // Force a clean build with the correct project root
+    execSync('npx next build', { 
+      cwd: projectRoot, 
+      stdio: 'inherit',
+      env: { ...process.env, NODE_ENV: 'production' }
+    });
   } catch (err) {
     console.error('Failed to build the project. Please ensure you have all dependencies installed.');
     process.exit(1);
   }
 }
 
-// Check database (try to create if doesn't exist)
+// Check database
 try {
   console.log('Checking database connection...');
-  // This is a simple check, in a real app you might want to run a migration script
 } catch (err) {
-  console.log('Warning: Database check failed. You might need to create the "dndsolo" database manually.');
+  console.log('Warning: Database check failed.');
 }
 
 console.log('\nStarting Infinite Realms...');
 console.log('Access the application at http://localhost:3000\n');
 
-const start = spawn('npm', ['run', 'start'], {
+const start = spawn('npx', ['next', 'start'], {
   cwd: projectRoot,
   stdio: 'inherit',
-  shell: true
+  shell: true,
+  env: { ...process.env, NODE_ENV: 'production' }
 });
 
 start.on('close', (code) => {
