@@ -21,7 +21,7 @@ AI-powered solo Dungeons & Dragons 5th Edition experience.
 - **Framework**: Next.js 15 (App Router)
 - **Frontend**: React 19, Tailwind CSS, Radix UI
 - **AI**: OpenAI GPT-4o, DALL-E 3 (via Vercel AI SDK)
-- **Database**: PostgreSQL
+- **Database**: PGlite (WASM-based embedded PostgreSQL)
 - **Language**: TypeScript
 
 ## Getting Started
@@ -29,19 +29,15 @@ AI-powered solo Dungeons & Dragons 5th Edition experience.
 ### Prerequisites
 
 - Node.js 18+
-- PostgreSQL 15+
 - OpenAI API key (or other supported LLM provider)
 
-### Installation (via CLI)
+### Installation (Instant DM)
 
-You can install Infinite Realms globally and run it directly:
+The easiest way to play is to install Infinite Realms globally. This includes an embedded PostgreSQL database (PGlite), so you don't need to install or configure any external services.
 
 ```bash
-# Using npm
+# Install globally
 npm install -g infinite-realms
-
-# Using yarn
-yarn global add infinite-realms
 ```
 
 Then start the application from anywhere:
@@ -49,6 +45,8 @@ Then start the application from anywhere:
 ```bash
 infinite-realms
 ```
+
+The CLI will automatically set up your local data directory at `~/.infinite-realms/` and start the server.
 
 ### Manual Installation (Development)
 
@@ -59,28 +57,14 @@ infinite-realms
    npm install
    ```
 
-2. Set up environment variables:
-   ```bash
-   cp .env.example .env.local
-   ```
-
-   Edit `.env.local` with your database URL and optionally your OpenAI API key.
-
-3. Set up the database:
-   ```bash
-   # Create the database
-   createdb dndsolo
-
-   # Run the app and hit the "Setup DB" button, or:
-   npm run db:schema
-   ```
-
-4. Start the development server:
+2. Start the development server:
    ```bash
    npm run dev
    ```
 
-5. Open [http://localhost:3000](http://localhost:3000)
+PGlite will automatically initialize a local database in the project directory.
+
+3. Open [http://localhost:3000](http://localhost:3000)
 
 ## How to Play
 
@@ -111,7 +95,7 @@ Once you access the web application, you must first configure your AI provider.
 ## Security & Token Usage
 
 ### Security Measures
-- **Local Storage**: Your API tokens are encrypted and stored in your local PostgreSQL database.
+- **Local Storage**: Your API tokens are encrypted and stored in your local embedded PostgreSQL database (PGlite), located in `~/.infinite-realms/pgdata`.
 - **Encryption**: We use AES-256 encryption to protect your tokens at rest.
 - **Server-Side Only**: Tokens are never sent to the client browser after they are saved; they are only used server-side to communicate with the LLM providers.
 
