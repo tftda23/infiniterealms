@@ -1,6 +1,6 @@
 {
   "name": "infinite-realms",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "AI-Powered Solo D&D 5e — full campaign engine with combat, spells, dice, and multiple AI providers",
   "bin": {
     "infinite-realms": "bin/cli.js"
