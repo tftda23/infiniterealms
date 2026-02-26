@@ -45,11 +45,37 @@ export interface TransactionClient {
 
 // Singleton PGlite instance
 let db: PGlite | null = null;
+let schemaInitialized = false;
 
 async function getDb(): Promise<PGlite> {
   if (!db) {
     db = new PGlite(DATA_DIR);
     await db.waitReady;
+
+    // Auto-initialize schema on first connection
+    if (!schemaInitialized) {
+      schemaInitialized = true;
+      try {
+        // Quick check: does the campaigns table exist?
+        const result = await db.query<{ exists: boolean }>(`
+          SELECT EXISTS (
+            SELECT FROM information_schema.tables
+            WHERE table_schema = 'public'
+            AND table_name = 'campaigns'
+          ) as exists
+        `);
+        if (!result.rows[0]?.exists) {
+          console.log('Fresh database detected — initializing schema...');
+          await db.exec(SCHEMA);
+          // Also create app_settings table (used by settings service)
+          await db.exec(APP_SETTINGS_SCHEMA);
+          console.log('Schema initialized successfully.');
+        }
+      } catch (err) {
+        console.error('Auto-schema initialization failed:', err);
+        // Non-fatal — setupDatabase() can be called manually via API
+      }
+    }
   }
   return db;
 }
@@ -153,6 +179,25 @@ export async function checkDatabaseConnection(): Promise<boolean> {
 // ============================================
 // Schema Setup
 // ============================================
+
+export const APP_SETTINGS_SCHEMA = `
+-- App Settings table (for global AI keys and other settings)
+CREATE TABLE IF NOT EXISTS app_settings (
+  id INT PRIMARY KEY,
+  settings JSONB NOT NULL
+);
+
+-- Insert default global settings
+INSERT INTO app_settings (id, settings)
+VALUES (1, '{
+  "defaultProvider": "openai",
+  "defaultModel": "gpt-4o",
+  "temperature": 0.8,
+  "maxTokens": 2000,
+  "apiKeys": {}
+}')
+ON CONFLICT (id) DO NOTHING;
+`;
 
 export const SCHEMA = `
 -- Campaigns table

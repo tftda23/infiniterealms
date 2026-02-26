@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  serverExternalPackages: ['@electric-sql/pglite'],
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
