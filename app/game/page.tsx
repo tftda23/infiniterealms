@@ -287,7 +287,44 @@ function GamePageContent() {
   const [requestedSavingThrow, setRequestedSavingThrow] = useState<{ ability: string; dc: number; characterName?: string; source?: string; advantage?: 'normal' | 'advantage' | 'disadvantage'; toolCallId: string } | null>(null);
   const [systemMessage, setSystemMessage] = useState<{ content: string; timestamp: number } | undefined>();
   const openingSceneSent = useRef(false);
+
+  // #5: HP sync queue — serialize PATCH calls to prevent race conditions
+  const hpSyncQueue = useRef<Promise<void>>(Promise.resolve());
+  const syncCharacterHP = useCallback(async (characterId: string, newHp: number) => {
+    hpSyncQueue.current = hpSyncQueue.current.then(async () => {
+      try {
+        const syncRes = await fetch(`/api/characters/${characterId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ currentHp: Math.max(0, newHp) }),
+        });
+        const syncData = await syncRes.json();
+        if (syncData.success) {
+          setSelectedCharacter(syncData.data);
+          setCharacters(prev => prev.map(c => c.id === syncData.data.id ? syncData.data : c));
+        }
+      } catch (err) {
+        console.error('HP sync failed:', err);
+      }
+    });
+    return hpSyncQueue.current;
+  }, []);
+
+  // XP tracker: initialized from gameState if persisted, else fresh
   const [xpTracker] = useState<XPTracker>(() => createXPTracker());
+  const xpTrackerRef = useRef(xpTracker);
+  useEffect(() => { xpTrackerRef.current = xpTracker; }, [xpTracker]);
+  // Restore XP tracker from persisted game state
+  useEffect(() => {
+    if (gameState?.xpTracker) {
+      const saved = gameState.xpTracker;
+      Object.assign(xpTracker.categoryCounts, saved.categoryCounts);
+      xpTracker.encountersSinceStoryBeat = saved.encountersSinceStoryBeat;
+      xpTracker.lastStoryProgressionAt = saved.lastStoryProgressionAt;
+      xpTracker.sessionXP = saved.sessionXP;
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameState?.xpTracker]);
   const [lastXPAward, setLastXPAward] = useState<{ result: XPAwardResult; category: XPCategory; reason: string } | null>(null);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [leftPanelOpen, setLeftPanelOpen] = useState(true);
@@ -489,6 +526,16 @@ function GamePageContent() {
           : c
       ));
 
+      // Persist XP tracker state to game state
+      await handleUpdateGameState({
+        xpTracker: {
+          categoryCounts: { ...xpTracker.categoryCounts },
+          encountersSinceStoryBeat: xpTracker.encountersSinceStoryBeat,
+          lastStoryProgressionAt: xpTracker.lastStoryProgressionAt,
+          sessionXP: xpTracker.sessionXP,
+        },
+      });
+
       // Show XP notification
       setLastXPAward({ result, category, reason });
 
@@ -502,7 +549,8 @@ function GamePageContent() {
     } catch (err) {
       console.error('Failed to award XP:', err);
     }
-  }, [characters, xpTracker]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [characters, xpTracker, campaignId]);
 
   // Handle AI Tool Calls — returns results for tool calls that need AI continuation
   const handleToolCall = useCallback(async (toolCalls: any[]): Promise<ToolCallResult[]> => {
@@ -647,16 +695,7 @@ function GamePageContent() {
             for (const entry of currentGameState.initiativeOrder) {
               if (entry.isPlayer && entry.characterId) {
                 try {
-                  const syncRes = await fetch(`/api/characters/${entry.characterId}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ currentHp: Math.max(0, entry.hp || 0) }),
-                  });
-                  const syncData = await syncRes.json();
-                  if (syncData.success) {
-                    setSelectedCharacter(syncData.data);
-                    setCharacters(prev => prev.map(c => c.id === syncData.data.id ? syncData.data : c));
-                  }
+                  await syncCharacterHP(entry.characterId, entry.hp || 0);
                 } catch (e) { console.error('Failed to sync player HP at end of combat:', e); }
               }
             }
@@ -802,19 +841,10 @@ function GamePageContent() {
             );
             await handleUpdateGameState({ initiativeOrder: updatedOrder });
 
-            // Sync player character HP back to character record
+            // Sync player character HP back to character record (serialized)
             if (target.isPlayer && target.characterId) {
               try {
-                const syncRes = await fetch(`/api/characters/${target.characterId}`, {
-                  method: 'PATCH',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ currentHp: newHp }),
-                });
-                const syncData = await syncRes.json();
-                if (syncData.success) {
-                  setSelectedCharacter(syncData.data);
-                  setCharacters(prev => prev.map(c => c.id === syncData.data.id ? syncData.data : c));
-                }
+                await syncCharacterHP(target.characterId, newHp);
               } catch (e) { console.error('Failed to sync player HP:', e); }
             }
           }
@@ -865,19 +895,10 @@ function GamePageContent() {
           );
           await handleUpdateGameState({ initiativeOrder: updatedOrder });
 
-          // Sync player character HP back to character record
+          // Sync player character HP back to character record (serialized)
           if (combatant.isPlayer && combatant.characterId) {
             try {
-              const syncRes = await fetch(`/api/characters/${combatant.characterId}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ currentHp: newHp }),
-              });
-              const syncData = await syncRes.json();
-              if (syncData.success) {
-                setSelectedCharacter(syncData.data);
-                setCharacters(prev => prev.map(c => c.id === syncData.data.id ? syncData.data : c));
-              }
+              await syncCharacterHP(combatant.characterId, newHp);
             } catch (e) { console.error('Failed to sync player HP:', e); }
           }
 

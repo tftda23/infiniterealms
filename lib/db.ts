@@ -381,12 +381,16 @@ CREATE TABLE IF NOT EXISTS campaign_content (
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_characters_campaign ON characters(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_inventory_character ON inventory(character_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_name_lower ON inventory(LOWER(name));
 CREATE INDEX IF NOT EXISTS idx_spells_character ON spells(character_id);
 CREATE INDEX IF NOT EXISTS idx_messages_campaign ON messages(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_messages_timestamp ON messages(timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_campaign_timestamp ON messages(campaign_id, timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_session_logs_campaign ON session_logs(campaign_id);
 CREATE INDEX IF NOT EXISTS idx_rule_violations_campaign ON rule_violations(campaign_id);
+CREATE INDEX IF NOT EXISTS idx_rule_violations_unresolved ON rule_violations(campaign_id) WHERE resolved = false;
 CREATE INDEX IF NOT EXISTS idx_campaign_content_campaign ON campaign_content(campaign_id);
+CREATE INDEX IF NOT EXISTS idx_game_state_campaign ON game_state(campaign_id);
 `;
 
 export async function setupDatabase(): Promise<void> {

@@ -118,8 +118,10 @@ export interface RollResult {
 }
 
 export function rollDice(notation: string): RollResult {
+  // Normalize: strip spaces around operators so "2d6 + 3" becomes "2d6+3"
+  const normalized = notation.replace(/\s+/g, '').toLowerCase();
   // Parse notation like "2d6+3", "1d20", "4d6kh3" (keep highest 3)
-  const match = notation.toLowerCase().match(/^(\d+)?d(\d+)(kh(\d+)|kl(\d+))?([+-]\d+)?$/);
+  const match = normalized.match(/^(\d+)?d(\d+)(kh(\d+)|kl(\d+))?([+-]\d+)?$/);
 
   if (!match) {
     throw new Error(`Invalid dice notation: ${notation}`);
@@ -158,31 +160,31 @@ export function rollDice(notation: string): RollResult {
   };
 }
 
-export function rollWithAdvantage(): RollResult {
+export function rollWithAdvantage(modifier = 0): RollResult {
   const roll1 = Math.floor(Math.random() * 20) + 1;
   const roll2 = Math.floor(Math.random() * 20) + 1;
   const higher = Math.max(roll1, roll2);
 
   return {
-    notation: '2d20kh1 (advantage)',
+    notation: `2d20kh1${modifier >= 0 ? '+' : ''}${modifier} (advantage)`,
     rolls: [roll1, roll2],
-    modifier: 0,
-    total: higher,
+    modifier,
+    total: higher + modifier,
     criticalHit: higher === 20,
     criticalMiss: higher === 1,
   };
 }
 
-export function rollWithDisadvantage(): RollResult {
+export function rollWithDisadvantage(modifier = 0): RollResult {
   const roll1 = Math.floor(Math.random() * 20) + 1;
   const roll2 = Math.floor(Math.random() * 20) + 1;
   const lower = Math.min(roll1, roll2);
 
   return {
-    notation: '2d20kl1 (disadvantage)',
+    notation: `2d20kl1${modifier >= 0 ? '+' : ''}${modifier} (disadvantage)`,
     rolls: [roll1, roll2],
-    modifier: 0,
-    total: lower,
+    modifier,
+    total: lower + modifier,
     criticalHit: lower === 20,
     criticalMiss: lower === 1,
   };

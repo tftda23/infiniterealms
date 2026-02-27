@@ -90,9 +90,11 @@ interface CharacterSheetProps {
   onUpdatePortrait?: (portraitUrl: string) => void;
   onUpdateNotes?: (notes: string) => Promise<void>;
   onToggleEquip?: (itemId: string, equipped: boolean) => Promise<void>;
+  onExpendSpellSlot?: (level: number) => Promise<void>;
+  onRestoreSpellSlot?: (level: number) => Promise<void>;
 }
 
-export function CharacterSheet({
+export const CharacterSheet = React.memo(function CharacterSheet({
   character,
   inventory = [],
   spells = [],
@@ -105,6 +107,8 @@ export function CharacterSheet({
   onUpdatePortrait,
   onUpdateNotes,
   onToggleEquip,
+  onExpendSpellSlot,
+  onRestoreSpellSlot,
 }: CharacterSheetProps) {
   const [lastRoll, setLastRoll] = useState<{ result: number; description: string } | null>(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -114,6 +118,8 @@ export function CharacterSheet({
   const [journalText, setJournalText] = useState(character.notes || '');
   const [journalSaving, setJournalSaving] = useState(false);
   const [journalDirty, setJournalDirty] = useState(false);
+  // #20: Track class feature usage (resets on rest)
+  const [featureUses, setFeatureUses] = useState<Record<string, number>>({});
   const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Auto-save journal after 1.5s of inactivity
@@ -667,24 +673,56 @@ export function CharacterSheet({
                     <Star className="w-3 h-3" /> Class Features
                   </h4>
                   <div className="space-y-1">
-                    {features.map((feat, i) => (
-                      <details key={i} className="group">
-                        <summary className="flex items-center justify-between p-2 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 text-sm">
-                          <div className="flex items-center gap-2">
-                            <ChevronRight className="w-3 h-3 group-open:hidden" />
-                            <ChevronDown className="w-3 h-3 hidden group-open:block" />
-                            <span className="font-medium">{feat.name}</span>
+                    {features.map((feat, i) => {
+                      const usedCount = featureUses[feat.name] || 0;
+                      return (
+                        <details key={i} className="group">
+                          <summary className="flex items-center justify-between p-2 bg-muted rounded-lg cursor-pointer hover:bg-muted/80 text-sm">
+                            <div className="flex items-center gap-2">
+                              <ChevronRight className="w-3 h-3 group-open:hidden" />
+                              <ChevronDown className="w-3 h-3 hidden group-open:block" />
+                              <span className="font-medium">{feat.name}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {feat.uses && usedCount > 0 && (
+                                <Badge variant="secondary" className="text-[10px] h-4 px-1">
+                                  Used {usedCount}×
+                                </Badge>
+                              )}
+                              <span className="text-xs text-muted-foreground">Lvl {feat.level}</span>
+                            </div>
+                          </summary>
+                          <div className="px-3 py-2 text-xs text-muted-foreground leading-relaxed">
+                            {feat.description}
+                            {feat.uses && (
+                              <div className="flex items-center gap-2 mt-2">
+                                <span className="text-primary/70 font-medium">Uses: {feat.uses}</span>
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    setFeatureUses(prev => ({ ...prev, [feat.name]: (prev[feat.name] || 0) + 1 }));
+                                  }}
+                                  className="px-2 py-0.5 text-[10px] rounded bg-red-500/20 hover:bg-red-500/40 text-red-300 font-medium transition-colors"
+                                >
+                                  Use
+                                </button>
+                                {usedCount > 0 && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      setFeatureUses(prev => ({ ...prev, [feat.name]: Math.max(0, (prev[feat.name] || 0) - 1) }));
+                                    }}
+                                    className="px-2 py-0.5 text-[10px] rounded bg-green-500/20 hover:bg-green-500/40 text-green-300 font-medium transition-colors"
+                                  >
+                                    Restore
+                                  </button>
+                                )}
+                              </div>
+                            )}
                           </div>
-                          <span className="text-xs text-muted-foreground">Lvl {feat.level}</span>
-                        </summary>
-                        <div className="px-3 py-2 text-xs text-muted-foreground leading-relaxed">
-                          {feat.description}
-                          {feat.uses && (
-                            <span className="block mt-1 text-primary/70 font-medium">Uses: {feat.uses}</span>
-                          )}
-                        </div>
-                      </details>
-                    ))}
+                        </details>
+                      );
+                    })}
                   </div>
                 </div>
               );
@@ -701,18 +739,36 @@ export function CharacterSheet({
                     .filter(([, slot]) => slot.max > 0)
                     .map(([level, slot]) => {
                       const remaining = slot.max - slot.used;
+                      const canExpend = remaining > 0 && !!onExpendSpellSlot;
+                      const canRestore = slot.used > 0 && !!onRestoreSpellSlot;
                       return (
                         <div
                           key={level}
                           className={cn(
-                            "rounded-lg px-2.5 py-1.5 text-xs border",
+                            "rounded-lg px-2.5 py-1.5 text-xs border flex items-center gap-1.5",
                             remaining > 0
                               ? "bg-violet-500/10 border-violet-500/20 text-violet-300"
                               : "bg-muted border-border text-muted-foreground line-through"
                           )}
                         >
-                          <span className="font-medium">Lvl {level}:</span>{' '}
-                          <span className="font-bold">{remaining}</span>/{slot.max}
+                          {canRestore && (
+                            <button
+                              onClick={() => onRestoreSpellSlot(Number(level))}
+                              className="w-4 h-4 rounded-full bg-green-600/30 hover:bg-green-600/60 text-green-300 text-[10px] font-bold flex items-center justify-center transition-colors"
+                              title={`Restore level ${level} slot`}
+                            >+</button>
+                          )}
+                          <span>
+                            <span className="font-medium">Lvl {level}:</span>{' '}
+                            <span className="font-bold">{remaining}</span>/{slot.max}
+                          </span>
+                          {canExpend && (
+                            <button
+                              onClick={() => onExpendSpellSlot(Number(level))}
+                              className="w-4 h-4 rounded-full bg-red-600/30 hover:bg-red-600/60 text-red-300 text-[10px] font-bold flex items-center justify-center transition-colors"
+                              title={`Expend level ${level} slot`}
+                            >−</button>
+                          )}
                         </div>
                       );
                     })}
@@ -805,4 +861,4 @@ export function CharacterSheet({
       </CardContent>
     </Card>
   );
-}
+});

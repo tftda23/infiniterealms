@@ -493,16 +493,31 @@ export function DMChat({
 
         for (const line of lines) {
           if (line.startsWith('0:')) {
-            const text = JSON.parse(line.slice(2));
-            content += text;
+            try {
+              const text = JSON.parse(line.slice(2));
+              content += text;
 
-            setMessages(prev => {
-              const idx = prev.findIndex(m => m.id === messageId);
-              if (idx > -1) {
-                return prev.map((m, i) => i === idx ? { ...m, content } : m);
+              setMessages(prev => {
+                const idx = prev.findIndex(m => m.id === messageId);
+                if (idx > -1) {
+                  return prev.map((m, i) => i === idx ? { ...m, content } : m);
+                }
+                return [...prev, { id: messageId, role: 'assistant' as const, content }];
+              });
+            } catch {
+              // Stream chunk may be partial — append raw text as fallback
+              const raw = line.slice(2).replace(/^"|"$/g, '');
+              if (raw) {
+                content += raw;
+                setMessages(prev => {
+                  const idx = prev.findIndex(m => m.id === messageId);
+                  if (idx > -1) {
+                    return prev.map((m, i) => i === idx ? { ...m, content } : m);
+                  }
+                  return [...prev, { id: messageId, role: 'assistant' as const, content }];
+                });
               }
-              return [...prev, { id: messageId, role: 'assistant' as const, content }];
-            });
+            }
           } else if (line.startsWith('1:')) {
             try {
               const toolCalls = JSON.parse(line.slice(2));

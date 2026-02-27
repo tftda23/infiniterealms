@@ -1,4 +1,4 @@
-import { query } from '../db';
+import { query, transaction } from '../db';
 import type { Character, InventoryItem, Spell, AbilityScores, SavingThrows, Skills } from '../../types';
 
 // ============================================
@@ -60,46 +60,48 @@ export async function createCharacter(data: {
   const hitDiceRemaining = data.hitDiceRemaining ?? level;
   const deathSaves = data.deathSaves || { successes: 0, failures: 0 };
 
-  const result = await query(
-    `INSERT INTO characters (
-      campaign_id, name, race, class, level, background, alignment,
-      ability_scores, max_hp, current_hp, proficiency_bonus,
-      armor_class, speed, saving_throws, skills,
-      hit_dice, hit_dice_remaining, death_saves, experience,
-      spellcasting_ability, spell_save_dc, spell_attack_bonus, spell_slots,
-      notes, sync_enabled
-    )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
-    RETURNING *`,
-    [
-      data.campaignId,
-      data.name,
-      data.race,
-      data.class,
-      level,
-      data.background || '',
-      data.alignment || '',
-      JSON.stringify(abilityScores),
-      maxHp,
-      profBonus,
-      armorClass,
-      speed,
-      JSON.stringify(savingThrows),
-      JSON.stringify(skills),
-      hitDice,
-      hitDiceRemaining,
-      JSON.stringify(deathSaves),
-      data.experience || 0,
-      data.spellcastingAbility || null,
-      data.spellSaveDC || null,
-      data.spellAttackBonus || null,
-      JSON.stringify(data.spellSlots || {}),
-      data.notes || '',
-      data.syncEnabled ?? false,
-    ]
-  );
+  return transaction(async (client) => {
+    const result = await client.query(
+      `INSERT INTO characters (
+        campaign_id, name, race, class, level, background, alignment,
+        ability_scores, max_hp, current_hp, proficiency_bonus,
+        armor_class, speed, saving_throws, skills,
+        hit_dice, hit_dice_remaining, death_saves, experience,
+        spellcasting_ability, spell_save_dc, spell_attack_bonus, spell_slots,
+        notes, sync_enabled
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
+      RETURNING *`,
+      [
+        data.campaignId,
+        data.name,
+        data.race,
+        data.class,
+        level,
+        data.background || '',
+        data.alignment || '',
+        JSON.stringify(abilityScores),
+        maxHp,
+        profBonus,
+        armorClass,
+        speed,
+        JSON.stringify(savingThrows),
+        JSON.stringify(skills),
+        hitDice,
+        hitDiceRemaining,
+        JSON.stringify(deathSaves),
+        data.experience || 0,
+        data.spellcastingAbility || null,
+        data.spellSaveDC || null,
+        data.spellAttackBonus || null,
+        JSON.stringify(data.spellSlots || {}),
+        data.notes || '',
+        data.syncEnabled ?? false,
+      ]
+    );
 
-  return mapCharacterRow(result.rows[0]);
+    return mapCharacterRow(result.rows[0]);
+  });
 }
 
 export async function getCharacter(id: string): Promise<Character | null> {
@@ -394,8 +396,18 @@ export async function updateInventoryItem(
 }
 
 export async function removeInventoryItem(id: string): Promise<boolean> {
+  // First try exact UUID match
   const result = await query(`DELETE FROM inventory WHERE id = $1`, [id]);
-  return (result.rowCount ?? 0) > 0;
+  if ((result.rowCount ?? 0) > 0) return true;
+
+  // Fall back to case-insensitive name match (AI tools often pass item names, not IDs)
+  const byName = await query(
+    `DELETE FROM inventory WHERE id = (
+      SELECT id FROM inventory WHERE LOWER(name) = LOWER($1) LIMIT 1
+    )`,
+    [id]
+  );
+  return (byName.rowCount ?? 0) > 0;
 }
 
 // ============================================

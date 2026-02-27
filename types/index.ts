@@ -232,6 +232,14 @@ export interface GameState {
   partyGold: number;
   partyInventory: InventoryItem[];
 
+  // XP tracker state (persisted for diminishing returns)
+  xpTracker?: {
+    categoryCounts: Record<string, number>;
+    encountersSinceStoryBeat: number;
+    lastStoryProgressionAt: number;
+    sessionXP: number;
+  };
+
   updatedAt: Date;
 }
 
@@ -244,6 +252,7 @@ export interface InitiativeEntry {
   hp?: number;
   maxHp?: number;
   ac?: number; // Armor Class — used by npcAction tool for hit/miss resolution
+  dexMod?: number; // DEX modifier for initiative tie-breaking (NPCs/enemies)
   conditions: string[];
   deathSaves?: { successes: number; failures: number };
   // Legacy grid fields (unused in Theater of the Mind mode)

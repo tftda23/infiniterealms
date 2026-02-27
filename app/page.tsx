@@ -57,6 +57,7 @@ export default function HomePage() {
     worldSetting: '',
   });
   const [creating, setCreating] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
   const [campaignCharacters, setCampaignCharacters] = useState<Record<string, Character[]>>({});
 
   // Check database status
@@ -132,8 +133,6 @@ export default function HomePage() {
   };
 
   const handleDeleteCampaign = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this campaign?')) return;
-
     try {
       const res = await fetch(`/api/campaigns/${id}`, { method: 'DELETE' });
       if (res.ok) {
@@ -142,6 +141,8 @@ export default function HomePage() {
       }
     } catch (error) {
       toast.error('Failed to delete campaign');
+    } finally {
+      setDeleteTarget(null);
     }
   };
 
@@ -398,7 +399,7 @@ export default function HomePage() {
                     <Button
                       variant="outline"
                       size="icon"
-                      onClick={() => handleDeleteCampaign(campaign.id)}
+                      onClick={() => setDeleteTarget({ id: campaign.id, name: campaign.name })}
                       className="border-border/50 hover:border-realm-crimson/50 hover:text-realm-crimson"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -410,6 +411,29 @@ export default function HomePage() {
           </div>
         )}
       </main>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Campaign</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete <strong>{deleteTarget?.name}</strong>? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteTarget(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteTarget && handleDeleteCampaign(deleteTarget.id)}
+            >
+              Delete Campaign
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Footer */}
       <footer className="border-t border-border/30 mt-auto">

@@ -33,6 +33,23 @@ import {
 import { cn, getAbilityModifier } from '../lib/utils';
 import type { Character, InitiativeEntry, GameState } from '../types';
 
+/** Sort by initiative descending, break ties with DEX modifier (higher goes first), then random */
+function sortByInitiative(entries: InitiativeEntry[], characters?: Character[]): InitiativeEntry[] {
+  return [...entries].sort((a, b) => {
+    if (b.initiative !== a.initiative) return b.initiative - a.initiative;
+    // Tie-breaker: compare DEX modifiers
+    const aDex = a.characterId
+      ? getAbilityModifier(characters?.find(c => c.id === a.characterId)?.abilityScores?.dexterity || 10)
+      : a.dexMod ?? 0;
+    const bDex = b.characterId
+      ? getAbilityModifier(characters?.find(c => c.id === b.characterId)?.abilityScores?.dexterity || 10)
+      : b.dexMod ?? 0;
+    if (bDex !== aDex) return bDex - aDex;
+    // Final tie-breaker: stable random (use name hash)
+    return a.name.localeCompare(b.name);
+  });
+}
+
 interface EncounterTrackerProps {
   gameState: GameState | null;
   characters: Character[];
@@ -65,7 +82,7 @@ const COMMON_CONDITIONS = [
   'Prone', 'Restrained', 'Stunned', 'Unconscious', 'Exhaustion',
 ];
 
-export function EncounterTracker({
+export const EncounterTracker = React.memo(function EncounterTracker({
   gameState,
   characters,
   onUpdateGameState,
@@ -123,8 +140,8 @@ export function EncounterTracker({
   const startCombat = async () => {
     const partyEntries = rollPartyInitiative();
 
-    // Sort by initiative (highest first)
-    const sorted = [...partyEntries].sort((a, b) => b.initiative - a.initiative);
+    // Sort by initiative (highest first, DEX tie-breaker)
+    const sorted = sortByInitiative(partyEntries, characters);
 
     await onUpdateGameState({
       inCombat: true,
@@ -202,10 +219,8 @@ export function EncounterTracker({
       conditions: [],
     };
 
-    // Insert in correct initiative order
-    const newOrder = [...initiativeOrder, entry].sort(
-      (a, b) => b.initiative - a.initiative
-    );
+    // Insert in correct initiative order (DEX tie-breaker)
+    const newOrder = sortByInitiative([...initiativeOrder, entry], characters);
 
     await onUpdateGameState({ initiativeOrder: newOrder });
     addLogEntry('add', `${entry.name} joins combat (Init: ${entry.initiative})`);
@@ -232,11 +247,23 @@ export function EncounterTracker({
     if (combatant) addLogEntry('remove', `${combatant.name} removed from combat`);
   };
 
+  // Check if all enemies are defeated (0 HP) — auto-suggest ending combat
+  const checkAllEnemiesDefeated = useCallback((order: InitiativeEntry[]) => {
+    const enemies = order.filter(c => !c.isPlayer);
+    if (enemies.length > 0 && enemies.every(c => (c.hp || 0) <= 0)) {
+      addLogEntry('end', 'All enemies defeated!');
+      if (onSendToChatAction) {
+        onSendToChatAction('[COMBAT VICTORY] All enemies have been defeated!');
+      }
+    }
+  }, [addLogEntry, onSendToChatAction]);
+
   // Update combatant HP
   const updateCombatantHP = async (id: string, newHp: number) => {
     const combatant = initiativeOrder.find(c => c.id === id);
     const oldHp = combatant?.hp || 0;
-    const clampedHp = Math.max(0, Math.min(newHp, combatant?.maxHp || 999));
+    const safeNewHp = isNaN(newHp) ? oldHp : newHp; // #13: NaN guard
+    const clampedHp = Math.max(0, Math.min(safeNewHp, combatant?.maxHp || 999));
     const diff = clampedHp - oldHp;
     const newOrder = initiativeOrder.map(c =>
       c.id === id ? { ...c, hp: clampedHp } : c
@@ -252,6 +279,8 @@ export function EncounterTracker({
         addLogEntry('damage', `${combatant.name} drops to 0 HP!`);
       }
     }
+    // Auto-check if all enemies are defeated
+    checkAllEnemiesDefeated(newOrder);
   };
 
   // Toggle condition
@@ -496,7 +525,7 @@ export function EncounterTracker({
                     {isDead && combatant.isPlayer ? (
                       // Death Saves for player characters at 0 HP — reads from persisted combatant.deathSaves
                       <div className="mt-2 space-y-2">
-                        <div className="text-xs font-semibold text-red-500">Death Saves</div>
+                        <div className="text-xs font-semibold text-red-500 animate-pulse">Death Saves</div>
                         <div className="flex items-center gap-3">
                           {/* Successes */}
                           <div className="flex items-center gap-1">
@@ -773,4 +802,4 @@ export function EncounterTracker({
       </Dialog>
     </Card>
   );
-}
+});

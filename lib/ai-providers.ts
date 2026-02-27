@@ -3,7 +3,7 @@
  * Supports: OpenAI, Anthropic Claude, Google Gemini, DeepSeek, OpenRouter
  */
 
-import OpenAI from 'openai';
+import type OpenAI from 'openai';
 import type { AIProvider, AIProviderConfig, AIModel, AISettings } from '../types';
 
 // ============================================
@@ -276,10 +276,20 @@ export const DEFAULT_AI_SETTINGS: AISettings = {
 // Provider Client Factory
 // ============================================
 
-export function createProviderClient(
+// Lazy-loaded OpenAI constructor — avoids importing the heavy SDK at module load
+let _OpenAI: typeof import('openai').default | null = null;
+async function getOpenAI(): Promise<typeof import('openai').default> {
+  if (!_OpenAI) {
+    const mod = await import('openai');
+    _OpenAI = mod.default;
+  }
+  return _OpenAI;
+}
+
+export async function createProviderClient(
   provider: AIProvider,
   apiKey: string
-): OpenAI {
+): Promise<OpenAI> {
   const config = AI_PROVIDERS[provider];
 
   if (!config) {
@@ -287,15 +297,14 @@ export function createProviderClient(
   }
 
   // For Anthropic, we need special handling (different SDK)
-  // But we'll use a compatibility approach for now
   if (provider === 'anthropic') {
-    // Anthropic has an OpenAI-compatible endpoint at messages API
-    // We'll handle this specially in the chat route
     throw new Error('Anthropic requires special handling - use createAnthropicClient');
   }
 
+  const OpenAIConstructor = await getOpenAI();
+
   // All other providers use OpenAI-compatible API
-  return new OpenAI({
+  return new OpenAIConstructor({
     apiKey,
     baseURL: config.baseUrl,
     defaultHeaders: provider === 'openrouter' ? {

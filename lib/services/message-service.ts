@@ -13,16 +13,18 @@ export async function createMessage(data: {
   role: ChatMessage['role'];
   content: string;
   toolCalls?: ChatMessage['toolCalls'];
-  tool_call_id?: string; // Add this
+  tool_call_id?: string;
   toolResults?: ChatMessage['toolResults'];
   diceRolls?: DiceRoll[];
   sceneChange?: boolean;
 }): Promise<ChatMessage> {
+  // Use a small random offset to avoid timestamp collisions on rapid inserts
+  const timestamp = new Date(Date.now() + Math.random() * 2);
   const result = await query(
     `INSERT INTO messages (
-      campaign_id, role, content, tool_calls, tool_results, dice_rolls, scene_change, tool_call_id
+      campaign_id, role, content, tool_calls, tool_results, dice_rolls, scene_change, tool_call_id, timestamp
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING *`,
     [
       data.campaignId,
@@ -32,7 +34,8 @@ export async function createMessage(data: {
       data.toolResults ? JSON.stringify(data.toolResults) : null,
       data.diceRolls ? JSON.stringify(data.diceRolls) : null,
       data.sceneChange || false,
-      data.tool_call_id || null, // Add this
+      data.tool_call_id || null,
+      timestamp,
     ]
   );
   return mapMessageRow(result.rows[0]);
@@ -204,15 +207,20 @@ export async function resolveRuleViolation(id: string): Promise<RuleViolation | 
 // Row Mappers
 // ============================================
 
+function safeJsonParse(value: unknown): unknown {
+  if (typeof value !== 'string' || !value) return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    console.warn('Failed to parse JSON field, returning null:', value?.toString().substring(0, 80));
+    return null;
+  }
+}
+
 function mapMessageRow(row: Record<string, unknown>): ChatMessage {
   // Safely parse tool_calls and tool_results if they are stored as JSON strings
-  const toolCalls = (typeof row.tool_calls === 'string' && row.tool_calls)
-    ? JSON.parse(row.tool_calls)
-    : row.tool_calls;
-  
-  const toolResults = (typeof row.tool_results === 'string' && row.tool_results)
-    ? JSON.parse(row.tool_results)
-    : row.tool_results;
+  const toolCalls = safeJsonParse(row.tool_calls);
+  const toolResults = safeJsonParse(row.tool_results);
 
   return {
     id: row.id as string,
